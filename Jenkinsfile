@@ -5,6 +5,11 @@ pipeline {
         DOCKER_CRED = credentials('jenkins-docker-token')
     }
 
+    tools {
+        maven 'Maven-3.9'
+        jdk 'JDK-11'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -12,6 +17,18 @@ pipeline {
                 git branch: 'main',
                     credentialsId: 'github-token',
                     url: 'https://github.com/nmtherethere-bot/practice-jenkis-pipeline.git'
+            }
+        }
+
+        stage('Build JAR') {
+            steps {
+                bat 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Verify JAR') {
+            steps {
+                bat 'dir target'
             }
         }
 
@@ -44,7 +61,7 @@ pipeline {
 
     post {
         success {
-            echo 'Docker image built and pushed successfully 🎉'
+            echo 'CI + Docker pipeline executed successfully 🎉'
         }
         failure {
             echo 'Pipeline failed ❌'
